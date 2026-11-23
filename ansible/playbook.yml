@@ -1,0 +1,24 @@
+---
+- name: Configure local Task Manager lab
+  hosts: local
+  gather_facts: true
+
+  tasks:
+    - name: Display system information
+      ansible.builtin.debug:
+        msg: "Managed host: {{ inventory_hostname }}; OS: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
+
+    - name: Ensure Ansible output directory exists
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/output"
+        state: directory
+        mode: "0755"
+
+    - name: Verify project Dockerfile exists
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../Dockerfile"
+      register: dockerfile_check
+
+    - name: Report Dockerfile status
+      ansible.builtin.debug:
+        msg: "Dockerfile exists: {{ dockerfile_check.stat.exists }}"
