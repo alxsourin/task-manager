@@ -1,0 +1,8 @@
+---
+- name: Deploy Task Manager
+  hosts: local
+  become: true
+  gather_facts: true
+
+  roles:
+    - task_manager

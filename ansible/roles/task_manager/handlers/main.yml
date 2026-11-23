@@ -1,0 +1,5 @@
+---
+- name: Restart Task Manager
+  ansible.builtin.command:
+    cmd: docker compose up -d --build
+    chdir: "{{ task_manager_app_dir }}"

@@ -1,0 +1,48 @@
+---
+- name: Check Docker availability
+  ansible.builtin.command:
+    cmd: docker info
+  changed_when: false
+
+- name: Check Docker Compose availability
+  ansible.builtin.command:
+    cmd: docker compose version
+  changed_when: false
+
+- name: Create application directory
+  ansible.builtin.file:
+    path: "{{ task_manager_app_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Copy application files
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../{{ item }}"
+    dest: "{{ task_manager_app_dir }}/"
+    remote_src: false
+    mode: preserve
+  loop: "{{ task_manager_project_files }}"
+  notify: Restart Task Manager
+
+- name: Copy application environment file
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../.env"
+    dest: "{{ task_manager_app_dir }}/.env"
+    owner: "{{ lookup('env', 'USER') }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart Task Manager
+
+- name: Apply pending handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for Task Manager health endpoint
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ task_manager_app_port }}/health"
+    method: GET
+    status_code: 200
+    timeout: 5
+  register: task_manager_health
+  until: task_manager_health.status is defined and task_manager_health.status == 200
+  retries: 30
+  delay: 2

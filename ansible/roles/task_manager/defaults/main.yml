@@ -1,0 +1,18 @@
+---
+# Application configuration
+task_manager_app_dir: /opt/task-manager
+task_manager_app_port: 5000
+
+# Docker configuration
+task_manager_compose_file: compose.yaml
+
+# Application files
+task_manager_project_files:
+  - Dockerfile
+  - compose.yaml
+  - requirements.txt
+  - .dockerignore
+  - app
+
+# Deployment configuration
+task_manager_wait_timeout: 60
